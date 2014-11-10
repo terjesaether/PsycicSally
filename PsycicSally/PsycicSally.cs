@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PsycicSally;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace ConsoleApplication6
         int numberToGuess;
         int numberOfGuesses;
         bool isRunning;
+        DateTime startTime;
 
         public bool IsRunning
         { 
@@ -30,6 +32,8 @@ namespace ConsoleApplication6
 
             numberToGuess = random.Next(0, 100);
 
+            startTime = DateTime.Now;
+
             Console.WriteLine("Game started.");
         }
 
@@ -43,6 +47,10 @@ namespace ConsoleApplication6
 
             if (result == GuessResult.Correct)
             {
+                var endTime = DateTime.Now;
+                var totalTime = endTime.Subtract(startTime);
+                var score = new Score(numberOfGuesses, totalTime.TotalSeconds);
+                Console.WriteLine("Your score was: " + score);
                 isRunning = false;
             }
             
