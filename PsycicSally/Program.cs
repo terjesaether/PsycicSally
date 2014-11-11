@@ -12,14 +12,20 @@ namespace ConsoleApplication6
         {
             var game = new PsycicSally();
 
-            game.Start();
-
-            while (game.IsRunning)
+            bool playing = true;
+            while (playing)
             {
-                game.MakeNewGuess();
-            }
+                game.Start();
 
-            Console.ReadKey();
+                Console.WriteLine();
+                Console.WriteLine("Game finished. Press Esc to exit, any other key to continue");
+
+                var key = Console.ReadKey();
+                if (key.Key == ConsoleKey.Escape)
+                {
+                    playing = false;
+                }
+            }
         }
     }
 }

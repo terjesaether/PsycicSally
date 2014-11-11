@@ -9,10 +9,13 @@ namespace ConsoleApplication6
 {
     public class PsycicSally
     {
-        int numberToGuess;
-        int numberOfGuesses;
-        bool isRunning;
-        DateTime startTime;
+        private int min = 1;
+        private int max = 100;
+        private int numberToGuess;
+        private int guesses;
+        private bool isRunning;
+        private DateTime startTime;
+        private DateTime endTime;
 
         public bool IsRunning
         { 
@@ -25,39 +28,39 @@ namespace ConsoleApplication6
 
         public void Start()
         {
-            numberOfGuesses = 0;
+            guesses = 0;
             isRunning = true;
 
             var random = new Random();
 
-            numberToGuess = random.Next(0, 100);
+            numberToGuess = random.Next(min, max);
 
             startTime = DateTime.Now;
 
             Console.WriteLine("Game started.");
+
+            while (IsRunning)
+            {
+                MakeNewGuess();
+            }
         }
 
-        public GuessResult MakeNewGuess()
+        public void Stop()
         {
-            numberOfGuesses++;
+            endTime = DateTime.Now;
+            isRunning = false;
+        }
+
+        public void MakeNewGuess()
+        {
+            guesses++;
 
             GuessResult result = Guess();
 
-            PrintResult(result);
-
-            if (result == GuessResult.Correct)
-            {
-                var endTime = DateTime.Now;
-                var totalTime = endTime.Subtract(startTime);
-                var score = new Score(numberOfGuesses, totalTime.TotalSeconds);
-                Console.WriteLine("Your score was: " + score);
-                isRunning = false;
-            }
-            
-            return result;
+            HandleResult(result);
         }
 
-        public void PrintResult(GuessResult result)
+        public void HandleResult(GuessResult result)
         {
             switch (result)
             {
@@ -68,25 +71,59 @@ namespace ConsoleApplication6
                     Console.WriteLine("Too low! Aim higher.");
                     break;
                 case GuessResult.Correct:
-                    Console.WriteLine("Wow. You are really a psycic! You managed to guess the magic number in " + numberOfGuesses + " guesses");
+                    Stop();
+                    HandleCorrectGuess();
                     break;
                 default:
-                    throw new NotSupportedException("GuessResult '" + result.ToString() + "' is not supported.");
+                    var errorMessage = string.Format("GuessResult '{0}' is not supported.", result);
+                    throw new NotSupportedException(errorMessage);
             }
+        }
 
+        private void HandleCorrectGuess()
+        {
+            var score = GetScore();
+            Console.Write("Wow. You are really a psycic! ");
+            Console.WriteLine(
+                "You managed to guess the magic number in {0} guesses and {1} seconds.",
+                score.Guesses,
+                score.TotalTime);
+
+            //TODO: Add to highscore if good enough
+        }
+
+        private Score GetScore()
+        {
+            DateTime totalTime;
+            Score score = new Score();
+
+            //TODO: Calculate total time and create score object
+            return score;
         }
 
         private GuessResult Guess()
         {
-            Console.WriteLine("Guess a number between 0 and 100:");
+            int guessedNumber = ReadGuessFromConsole();
 
-            int guessedNumber = int.Parse(Console.ReadLine());
             int guessResult = guessedNumber.CompareTo(numberToGuess);
 
-            var result = (GuessResult)guessResult;
+            var result = (GuessResult) guessResult;
 
             return result;
+        }
 
+        private int ReadGuessFromConsole()
+        {
+            string input;
+            int guessedNumber;
+            do
+            {
+                Console.Write("Guess a number between {0} and {1}: ", min, max);
+                input = Console.ReadLine();
+            }
+            while (!int.TryParse(input, out guessedNumber));
+            
+            return guessedNumber;
         }
     }
 }
