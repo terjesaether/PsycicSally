@@ -89,15 +89,27 @@ namespace ConsoleApplication6
                 score.Guesses,
                 score.TotalTime);
 
-            //TODO: Add to highscore if good enough
+            bool addToHighScore =  HighScore.IsScoreHighEnough(score);
+            if (addToHighScore)
+            {
+                Console.WriteLine("Wow! You are so good. You reached the highscore.");
+                Console.Write("Enter name: ");
+                string name = Console.ReadLine();
+
+                HighScore.AddScore(name, score);
+                HighScore.Print();
+            }
         }
 
         private Score GetScore()
         {
-            DateTime totalTime;
-            Score score = new Score();
+            TimeSpan duration = endTime.Subtract(startTime);
+            double totalTime = duration.TotalSeconds;
 
-            //TODO: Calculate total time and create score object
+            Score score = new Score(
+                guesses,
+                totalTime);
+
             return score;
         }
 

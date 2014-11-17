@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace PsycicSally
 {
@@ -28,7 +30,12 @@ namespace PsycicSally
 
             public override string ToString()
             {
-                return string.Join(",", new string[]{name, score.Guesses.ToString(), score.TotalTime.ToString(CultureInfo.InvariantCulture)});
+                return string.Join(",", new string[]
+                {
+                    name,
+                    score.Guesses.ToString(),
+                    score.TotalTime.ToString(CultureInfo.InvariantCulture)
+                });
             }
             public static Scoring Parse(string s)
             {
@@ -43,8 +50,13 @@ namespace PsycicSally
                 return scoring;
             }
         }
-
+        private static string filename = "highscore.txt";
         private static List<Scoring> scores = new List<Scoring>();
+
+        static HighScore()
+        {
+            Load();
+        }
 
         public static void AddScore(
             string name,
@@ -53,6 +65,8 @@ namespace PsycicSally
             scores.Add(new Scoring(name, score));
 
             ReorderAndResizeHighScoreList();
+
+            Save();
         }
 
         private static void ReorderAndResizeHighScoreList()
@@ -100,6 +114,20 @@ namespace PsycicSally
             var text = ToHallOfFame();
 
             Console.WriteLine(text);
+        }
+
+        private static void Load()
+        {
+            scores = File.ReadAllLines(filename)
+                .Select(Scoring.Parse)
+                .ToList();
+        }
+
+        private static void Save()
+        {
+            var linesToSave = scores.Select(score => score.ToString());
+
+            File.WriteAllLines(filename, linesToSave);
         }
 
         private static string ToHallOfFame()
